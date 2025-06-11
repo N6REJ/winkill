@@ -15,19 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_1584D3DBB2AD44DB984B3B4111EEC03A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_820E4CC8E4844E2C8C400B1547A9F8E1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A2D1A2D2B54D400AA13E06C27ADAB8D9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -92,46 +80,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1584D3DBB2AD44DB984B3B4111EEC03A"
-            {
-            "SourcePath" = "8:D:\\Desktop\\winkill-64.ico"
-            "TargetName" = "8:winkill-64.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_898C06C139334028A2BEBA171BA22035"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A2D1A2D2B54D400AA13E06C27ADAB8D9"
-            {
-            "SourcePath" = "8:D:\\Desktop\\Active.ico"
-            "TargetName" = "8:Active.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_898C06C139334028A2BEBA171BA22035"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BE9127255C0C214E5483D88F310B4749"
             {
             "SourcePath" = "8:WinKillHook.dll"
@@ -208,15 +156,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Winkill"
-        "ProductCode" = "8:{6818FE58-B654-45FD-A494-9E8F3AD182D4}"
-        "PackageCode" = "8:{68A2E517-9038-4C5A-B89A-5803EE535104}"
+        "ProductCode" = "8:{7A2940A4-394B-416A-A179-B8C11AEF3C19}"
+        "PackageCode" = "8:{79A7B391-314A-4DDD-B167-203C1BCAFE10}"
         "UpgradeCode" = "8:{405A6361-BFCC-4A87-837D-4B927683841D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:"
+        "ProductVersion" = "8:1.0.0"
         "Manufacturer" = "8:Default Company Name"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://hallhome.us"
