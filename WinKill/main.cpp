@@ -131,7 +131,9 @@ static void createWindow(HINSTANCE instance) {
         SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 
     // Register Pause/Break key as a global hotkey (id=1)
-    RegisterHotKey(mainWindow, 1, 0, VK_PAUSE);
+    if (!RegisterHotKey(mainWindow, 1, 0, VK_PAUSE)) {
+        MessageBox(mainWindow, L"Failed to register Pause/Break as a global hotkey. It may already be registered by another application.", L"Hotkey Registration Failed", MB_OK | MB_ICONERROR);
+    }
 
     createTrayMenu();
     showTrayIcon();
