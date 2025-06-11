@@ -151,7 +151,7 @@ if exist "z:\upx.exe" "z:\upx.exe" -9 "$(OutDir)WinKillHook.dll"</Command>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(SolutionDir)x64\release\WinKill.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>./x64/release/
