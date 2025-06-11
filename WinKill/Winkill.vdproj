@@ -115,6 +115,17 @@
             "Property" = "8:ProgramMenuFolder"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_4518C24BC24D4931A0CBDC731F9EAF1F"
+                    {
+                    "Name" = "8:Winkill"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_3E908BCA509840568B9835B88FAA1A61"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_898C06C139334028A2BEBA171BA22035"
@@ -157,7 +168,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Winkill"
         "ProductCode" = "8:{7A2940A4-394B-416A-A179-B8C11AEF3C19}"
-        "PackageCode" = "8:{47AFC125-F8E7-4A03-8D0F-A9B689B12279}"
+        "PackageCode" = "8:{44FF956F-D33A-41C2-91C6-167568CD3387}"
         "UpgradeCode" = "8:{405A6361-BFCC-4A87-837D-4B927683841D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -277,6 +288,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_9370BC2191EC4115BDAE9109CA43CF7C"
+            {
+            "Name" = "8:Winkill"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_820E4CC8E4844E2C8C400B1547A9F8E1"
+            "Folder" = "8:_4518C24BC24D4931A0CBDC731F9EAF1F"
+            "WorkingFolder" = "8:_E28326A8B6B34BF99C00D3D691C58F20"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {
