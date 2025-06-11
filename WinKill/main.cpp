@@ -1,4 +1,3 @@
-#include <StdAfx.h>
 #include <Windows.h>
 #include <Shellapi.h>
 #include <tchar.h>
