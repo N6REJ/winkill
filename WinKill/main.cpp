@@ -11,7 +11,7 @@
 #define MENU_ITEM_EXIT 1979
 #define MENU_ITEM_TOGGLE_CAPTION L"Toggle"
 #define MENU_ITEM_EXIT_CAPTION L"Exit"
-#define TRAY_ICON_TIP L"WinKill v0.3"
+#define TRAY_ICON_TIP L"WinKill v2025.6.11"
 #define WINDOW_CLASS L"WinKillClass"
 
 static HICON iconActive = nullptr, iconKilled = nullptr;
@@ -29,13 +29,12 @@ static void startHook();
 static void stopHook();
 static void toggleHook();
 static void createWindow(HINSTANCE instance);
-static bool startDisabled(LPWSTR args);
 static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 int CALLBACK wWinMain(HINSTANCE instance, HINSTANCE prev, LPWSTR args, int showType) {
     createWindow(instance);
 
-    startDisabled(args) ? stopHook() : startHook();
+    stopHook(); // Always start disabled
 
     MSG msg = { };
     while (GetMessage(&msg, nullptr, 0, 0)) {
@@ -67,7 +66,16 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
             return 0;
         }
 
+        case WM_HOTKEY: {
+            if (wParam == 1) { // id=1 for Pause/Break
+                toggleHook();
+                return 0;
+            }
+            break;
+        }
+
         case WM_DESTROY: {
+            UnregisterHotKey(hwnd, 1); // Unregister Pause/Break hotkey
             stopHook();
             hideTrayIcon();
             break;
@@ -92,14 +100,6 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-static bool startDisabled(LPWSTR args) {
-    if (!args) {
-        return false;
-    }
-
-    std::wstring str(args);
-    return str.find(L"/startDisabled") != std::string::npos;
-}
 
 static void createWindow(HINSTANCE instance) {
     iconActive = LoadIcon(instance, MAKEINTRESOURCE(IDR_MAINFRAME));
@@ -130,6 +130,9 @@ static void createWindow(HINSTANCE instance) {
         nullptr,
         -32000, -32000, 50, 50,
         SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+
+    // Register Pause/Break key as a global hotkey (id=1)
+    RegisterHotKey(mainWindow, 1, 0, VK_PAUSE);
 
     createTrayMenu();
     showTrayIcon();

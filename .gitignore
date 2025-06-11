@@ -6,3 +6,10 @@
 ipch
 *.VC.db
 *.VC.opendb
+.idea/.gitignore
+.idea/misc.xml
+.idea/modules.xml
+.idea/php.xml
+.idea/vcs.xml
+.idea/winkill.iml
+.idea/*
