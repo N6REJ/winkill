@@ -25,6 +25,12 @@
         "OwnerKey" = "8:_820E4CC8E4844E2C8C400B1547A9F8E1"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_E215B6F704C147E2B5423B693BB3B68B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -100,6 +106,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E215B6F704C147E2B5423B693BB3B68B"
+            {
+            "SourcePath" = "8:D:\\Desktop\\winkill-64.ico"
+            "TargetName" = "8:winkill-64.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_E28326A8B6B34BF99C00D3D691C58F20"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -168,7 +194,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Winkill"
         "ProductCode" = "8:{7A2940A4-394B-416A-A179-B8C11AEF3C19}"
-        "PackageCode" = "8:{44FF956F-D33A-41C2-91C6-167568CD3387}"
+        "PackageCode" = "8:{9AA24466-5FE0-432C-9826-039801272470}"
         "UpgradeCode" = "8:{405A6361-BFCC-4A87-837D-4B927683841D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -299,7 +325,7 @@
             "Target" = "8:_820E4CC8E4844E2C8C400B1547A9F8E1"
             "Folder" = "8:_4518C24BC24D4931A0CBDC731F9EAF1F"
             "WorkingFolder" = "8:_E28326A8B6B34BF99C00D3D691C58F20"
-            "Icon" = "8:"
+            "Icon" = "8:_E215B6F704C147E2B5423B693BB3B68B"
             "Feature" = "8:"
             }
         }
