@@ -1,3 +1,8 @@
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/N6REJ/winkill)
+![GitHub top language](https://img.shields.io/github/languages/top/N6REJ/winkill)
+![GitHub license](https://img.shields.io/github/license/N6REJ/winkill)
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
+
 # overview
 winkill lets you temporarily disable the windows key on your keyboard without rebooting your computer. 
 This is useful if you're always hitting the windows key when playing games. (yes, i know not everyone does this, but some of us do)
@@ -21,4 +26,4 @@ there's not much to it -- just a tray icon!
 windows 10 or higher
 
 # license
-the binaries and source are public domain, do whatever you want with them. ABSOLUTELY NO WARRANTY.
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0). See the [LICENSE](LICENSE) file for details.
