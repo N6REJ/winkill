@@ -1,6 +1,6 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/N6REJ/winkill)
 ![GitHub top language](https://img.shields.io/github/languages/top/N6REJ/winkill)
-![GitHub license](https://img.shields.io/github/license/N6REJ/winkill)
+![GitHub All Releases](https://img.shields.io/github/downloads/N6REJ/winkill/total)
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 # overview
