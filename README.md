@@ -1,8 +1,13 @@
 # overview
 winkill lets you temporarily disable the windows key on your keyboard without rebooting your computer. 
+
 This is useful if you're always hitting the windows key when playing games. (yes, i know not everyone does this, but some of us do)
+
 Click the winkill icon in the system tray to use it as a system-wide windows key disabler or toggle it on/off with the "pause"/"break" key
+
 To exit completely right click on the icon and choose exit.
+
+Be sure to start winkill before you start wow.
 
 # building
 
@@ -22,3 +27,4 @@ windows 10 or higher
 
 # license
 the binaries and source are public domain, do whatever you want with them. ABSOLUTELY NO WARRANTY.
+
