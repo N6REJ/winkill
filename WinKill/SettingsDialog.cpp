@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include "resource.h"
+#include "startup.h"
 
 const wchar_t* kSettingsKey = L"Software\\WinKill";
 const wchar_t* kStartupStateValue = L"StartupState"; // "active" or "inactive"

@@ -1,24 +1,10 @@
-version: 1.0.{build}
+version: '{build}'
 image: Visual Studio 2022
-
-configuration: Release
-platform: x64
 
 build_script:
   - msbuild WinKill\WinKill.vcxproj /p:Configuration=Release /p:Platform=x64
+  - msbuild WinKill\Winkill.vdproj /p:Configuration=Release
 
 artifacts:
-  - path: WinKill\x64\Release\*.exe
-    name: WinKillExe
-
-deploy:
-  provider: GitHub
-  auth_token: $(GH_PAT)
-  artifact: WinKillExe
-  draft: false
-  prerelease: false
-  on:
-    branch: main
-    APPVEYOR_REPO_TAG: true
-
-test: off
+  - path: WinKill\Release\*.msi
+    name: msi
