@@ -6,7 +6,7 @@
 #define IDS_ABOUTBOX                    101
 #define IDR_MAINFRAME                   128
 #define IDR_ACTIVEICON                  129
-#define IDI_KILLED                      128
+#define IDI_KILLED                      130
 #define IDC_TOGGLE_BUTTON               1001
 #define IDC_START_ACTIVE                1004
 #define IDC_START_INACTIVE              1005
