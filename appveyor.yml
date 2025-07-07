@@ -3,7 +3,7 @@ image: Visual Studio 2022
 
 build_script:
   - msbuild WinKill\WinKill.vcxproj /p:Configuration=Release /p:Platform=x64
-  - msbuild WinKill\Winkill.vdproj /p:Configuration=Release
+  - '"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" WinKill\Winkill.vdproj /build Release'
 
 artifacts:
   - path: WinKill\Release\*.msi
