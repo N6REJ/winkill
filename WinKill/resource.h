@@ -11,6 +11,8 @@
 #define IDC_START_INACTIVE              1005
 #define IDC_KEYBIND_EDIT                1006
 #define IDC_KEYBIND_SETBTN              1007
+#define IDC_AUTOSTART_CHECK             1008
+#define IDC_SAVE_BUTTON                 1009
 
 // Next default values for new objects
 // 
