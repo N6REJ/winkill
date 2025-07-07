@@ -1,7 +1,160 @@
-GROUPBOX        "Startup State", -1, 10, 30, 180, 30
-    AUTORADIOBUTTON "Start Active",   IDC_START_ACTIVE,   20, 40, 70, 10, WS_TABSTOP
-    AUTORADIOBUTTON "Start Inactive", IDC_START_INACTIVE, 100, 40, 80, 10
+/////////////////////////////////////////////////////////////////////////////
+// Microsoft Visual C++ generated resource script.
+#include "resource.h"
 
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <windows.h>
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\WinKill.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+IDR_MAINFRAME           ICON                    "res\\logo.ico"
+IDI_KILLED              ICON                    "res\\logo.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2025,7,7,1
+ PRODUCTVERSION 2025,7,7,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "Disables the Windows keys using a low level keyboard hook."
+            VALUE "CompanyName", "N6REJ"
+            VALUE "FileDescription", "WinKill"
+            VALUE "FileVersion", "2025.07.07.1"
+            VALUE "InternalName", "WinKill"
+            VALUE "LegalCopyright", "N6REJ"
+            VALUE "LegalTrademarks", "N6REJ"
+            VALUE "OriginalFilename", "WinKill.exe"
+            VALUE "ProductName", "WinKill"
+            VALUE "ProductVersion", "2025.07.07.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SETTINGS_DIALOG DIALOGEX 0, 0, 250, 120
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Settings"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "Autostart",IDC_AUTOSTART_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,10,80,10
+    GROUPBOX        "Startup State", -1, 10, 30, 230, 30
+    AUTORADIOBUTTON "Start Active",   IDC_START_ACTIVE,   20, 40, 70, 10, WS_TABSTOP
+    AUTORADIOBUTTON "Start Inactive", IDC_START_INACTIVE, 100, 40, 80, 10, WS_TABSTOP
     LTEXT           "Hotkey:", -1, 10, 65, 40, 10
     EDITTEXT        IDC_KEYBIND_EDIT, 55, 62, 70, 14, ES_READONLY
     PUSHBUTTON      "Set...", IDC_KEYBIND_SETBTN, 130, 62, 50, 14
+    PUSHBUTTON      "Save",IDC_SAVE_BUTTON,180,100,50,14
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_ABOUTBOX            "&About WinKill..."
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\WinKill.rc2"  // non-Microsoft Visual C++ edited resources
+#include "winres.h"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED

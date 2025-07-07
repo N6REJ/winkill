@@ -64,9 +64,10 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\Active.ico"
+IDR_MAINFRAME           ICON                    "res\\logo.ico"
+IDR_ACTIVEICON          ICON                    "res\\logo_active.ico"
 
-IDI_KILLED              ICON                    "res\\Killed.ico"
+IDI_KILLED              ICON                    "res\\logo.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,12 +93,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "Comments", "Disables the Windows keys using a low level keyboard hook."
-            VALUE "CompanyName", "avatar"
+            VALUE "CompanyName", "N6REJ"
             VALUE "FileDescription", "WinKill"
             VALUE "FileVersion", "2025.07.07.1"
             VALUE "InternalName", "WinKill"
-            VALUE "LegalCopyright", "avatar"
-            VALUE "LegalTrademarks", "avatar"
+            VALUE "LegalCopyright", "N6REJ"
+            VALUE "LegalTrademarks", "N6REJ"
             VALUE "OriginalFilename", "WinKill.exe"
             VALUE "ProductName", "WinKill"
             VALUE "ProductVersion", "2025.07.07.1"

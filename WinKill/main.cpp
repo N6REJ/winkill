@@ -101,8 +101,8 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 
 
 static void createWindow(HINSTANCE instance) {
-    iconActive = LoadIcon(instance, MAKEINTRESOURCE(IDR_MAINFRAME));
-    iconKilled = LoadIcon(instance, MAKEINTRESOURCE(IDI_KILLED));
+    iconActive = LoadIcon(instance, MAKEINTRESOURCE(IDR_ACTIVEICON));
+    iconKilled = LoadIcon(instance, MAKEINTRESOURCE(IDR_MAINFRAME));
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = windowProc;

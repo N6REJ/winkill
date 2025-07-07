@@ -171,6 +171,9 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 
 // --- Tray icon state initialization helper ---
 
+void SetTrayIconActive();
+void SetTrayIconInactive();
+
 void InitializeTrayIconBasedOnStartupState() {
     StartupState state = LoadStartupState();
     if (state == StartupState::Active) {
