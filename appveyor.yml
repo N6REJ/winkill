@@ -14,7 +14,7 @@ artifacts:
 deploy:
   provider: GitHub
   auth_token:
-    secure: %GH_PAT%
+    secure: GH_PAT
   artifact: WinKillExe
   draft: false
   prerelease: false
