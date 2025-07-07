@@ -75,8 +75,8 @@ IDI_KILLED              ICON                    "res\\Killed.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2025,6,11,0
- PRODUCTVERSION 2025,6,11,0
+ FILEVERSION 2025,7,7,1
+ PRODUCTVERSION 2025,7,7,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -94,19 +94,33 @@ BEGIN
             VALUE "Comments", "Disables the Windows keys using a low level keyboard hook."
             VALUE "CompanyName", "avatar"
             VALUE "FileDescription", "WinKill"
-            VALUE "FileVersion", "2025, 6, 11, 0"
+            VALUE "FileVersion", "2025.07.07.1"
             VALUE "InternalName", "WinKill"
             VALUE "LegalCopyright", "avatar"
             VALUE "LegalTrademarks", "avatar"
             VALUE "OriginalFilename", "WinKill.exe"
             VALUE "ProductName", "WinKill"
-            VALUE "ProductVersion", "2025, 6, 11, 0"
+            VALUE "ProductVersion", "2025.07.07.1"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
         VALUE "Translation", 0x409, 1200
     END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SETTINGS_DIALOG DIALOGEX 0, 0, 250, 120
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Settings"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "Autostart",IDC_AUTOSTART_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,10,80,10
+    PUSHBUTTON      "Save",IDC_SAVE_BUTTON,180,100,50,14
 END
 
 
@@ -146,4 +160,3 @@ LANGUAGE 9, 1
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
