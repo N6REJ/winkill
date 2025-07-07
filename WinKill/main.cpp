@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <Shellapi.h>
 #include <tchar.h>
-#include <WinKillHook.h>
+#include "winkillhook.h"
 #include <string>
 #include "resource.h"
 
