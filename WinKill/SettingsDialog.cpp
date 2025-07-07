@@ -146,8 +146,6 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
             return TRUE;
         }
         break;
-    }
-    // Key capture for hotkey
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
         if (g_capturingHotkey) {
