@@ -1,0 +1,7 @@
+GROUPBOX        "Startup State", -1, 10, 30, 180, 30
+    AUTORADIOBUTTON "Start Active",   IDC_START_ACTIVE,   20, 40, 70, 10, WS_TABSTOP
+    AUTORADIOBUTTON "Start Inactive", IDC_START_INACTIVE, 100, 40, 80, 10
+
+    LTEXT           "Hotkey:", -1, 10, 65, 40, 10
+    EDITTEXT        IDC_KEYBIND_EDIT, 55, 62, 70, 14, ES_READONLY
+    PUSHBUTTON      "Set...", IDC_KEYBIND_SETBTN, 130, 62, 50, 14

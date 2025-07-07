@@ -7,6 +7,10 @@
 #define IDR_MAINFRAME                   128
 #define IDI_KILLED                      129
 #define IDC_TOGGLE_BUTTON               1001
+#define IDC_START_ACTIVE                1004
+#define IDC_START_INACTIVE              1005
+#define IDC_KEYBIND_EDIT                1006
+#define IDC_KEYBIND_SETBTN              1007
 
 // Next default values for new objects
 // 

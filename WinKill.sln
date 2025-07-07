@@ -7,8 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinKill", "WinKill\WinKill.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinKillHook", "WinKillHook\WinKillHook.vcxproj", "{D5D6353E-2C3A-4B54-880C-B2FAC3FDC739}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Winkill", "WinKill\Winkill.vdproj", "{DC61758A-6263-6110-FC5C-776C798A62FB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -23,8 +21,6 @@ Global
 		{D5D6353E-2C3A-4B54-880C-B2FAC3FDC739}.Debug|Win32.Build.0 = Debug|Win32
 		{D5D6353E-2C3A-4B54-880C-B2FAC3FDC739}.Release|Win32.ActiveCfg = Release|x64
 		{D5D6353E-2C3A-4B54-880C-B2FAC3FDC739}.Release|Win32.Build.0 = Release|x64
-		{DC61758A-6263-6110-FC5C-776C798A62FB}.Debug|Win32.ActiveCfg = Debug
-		{DC61758A-6263-6110-FC5C-776C798A62FB}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
