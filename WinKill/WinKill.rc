@@ -64,10 +64,10 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\logo.ico"
-IDR_ACTIVEICON          ICON                    "res\\logo_active.ico"
+IDR_MAINFRAME           ICON                    "res\\Standby.ico"
+IDR_ACTIVEICON          ICON                    "res\\Active.ico"
 
-IDI_KILLED              ICON                    "res\\logo.ico"
+IDI_KILLED              ICON                    "res\\Standby.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -101,8 +101,8 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 
 
 static void createWindow(HINSTANCE instance) {
-    iconActive = LoadIcon(instance, MAKEINTRESOURCE(IDR_ACTIVEICON));
-    iconKilled = LoadIcon(instance, MAKEINTRESOURCE(IDR_MAINFRAME));
+    iconActive = LoadIcon(instance, MAKEINTRESOURCE(IDR_ACTIVEICON)); // Killed.ico (red line, active/on)
+    iconKilled = LoadIcon(instance, MAKEINTRESOURCE(IDR_MAINFRAME)); // Active.ico (no red line, standby/off)
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = windowProc;
@@ -150,7 +150,7 @@ static void showTrayIcon() {
     trayIconData.uID = 0;
     trayIconData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     trayIconData.uCallbackMessage = WM_MYTRAYICON;
-    trayIconData.hIcon = hooked ? iconKilled : iconActive;
+    trayIconData.hIcon = hooked ? iconActive : iconKilled;
     ::wcscpy_s(trayIconData.szTip, 255, TRAY_ICON_TIP);
 
     trayIconDataVisible = (Shell_NotifyIcon(NIM_ADD, &trayIconData) != 0);
@@ -198,7 +198,7 @@ static void startHook() {
     hooked = winkill_install_hook(mainWindow);
 
     if (hooked) {
-        setTrayIcon(iconKilled);
+        setTrayIcon(iconActive);
     }
     else {
         MessageBox(mainWindow, L"Couldn't start keyboard hook!", L"WinKill", MB_OK);
@@ -209,7 +209,7 @@ static void stopHook() {
     hooked = (!winkill_remove_hook());
 
     if (!hooked) {
-        setTrayIcon(iconActive);
+        setTrayIcon(iconKilled);
     }
 }
 
