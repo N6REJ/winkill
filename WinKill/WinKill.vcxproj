@@ -234,6 +234,7 @@ if exist "z:\upx.exe" "z:\upx.exe" -9 "$(OutDir)WinKillHook.dll"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\WinKill.rc2" />
+    <None Include="Winkill.vdproj" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h" />
