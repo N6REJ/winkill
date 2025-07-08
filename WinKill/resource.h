@@ -4,6 +4,7 @@
 //
 #define IDM_ABOUTBOX                    0x0010
 #define IDS_ABOUTBOX                    101
+#define IDD_SETTINGS_DIALOG             101
 #define IDR_MAINFRAME                   128
 #define IDR_ACTIVEICON                  129
 #define IDI_KILLED                      130

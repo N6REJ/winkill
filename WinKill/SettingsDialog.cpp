@@ -99,6 +99,21 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 
     switch (message) {
     case WM_INITDIALOG: {
+        // Set dialog icon
+        HICON hIcon = (HICON)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
+        SendMessage(hDlg, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+        SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+
+        // Center the dialog on the screen
+        RECT rcDlg, rcScreen;
+        GetWindowRect(hDlg, &rcDlg);
+        SystemParametersInfo(SPI_GETWORKAREA, 0, &rcScreen, 0);
+        int dlgWidth = rcDlg.right - rcDlg.left;
+        int dlgHeight = rcDlg.bottom - rcDlg.top;
+        int x = rcScreen.left + ((rcScreen.right - rcScreen.left) - dlgWidth) / 2;
+        int y = rcScreen.top + ((rcScreen.bottom - rcScreen.top) - dlgHeight) / 2;
+        SetWindowPos(hDlg, HWND_TOP, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
         wchar_t path[MAX_PATH] = {0};
         GetModuleFileNameW(NULL, path, MAX_PATH);
         exePath = path;

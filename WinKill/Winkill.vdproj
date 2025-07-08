@@ -22,7 +22,7 @@
     "Author" = "8:N6REJ"
     "Keywords" = "8:"
     "Description" = "8:Winkill Installer"
-    "AddRemoveProgramsIcon" = "8:"
+    "AddRemoveProgramsIcon" = "8:res\\Standby.ico"
     "Title" = "8:Winkill Installer"
     "Subject" = "8:"
     "ARPCONTACT" = "8:N6REJ"

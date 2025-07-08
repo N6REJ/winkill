@@ -3,7 +3,7 @@
 #include <tchar.h>
 #include "winkillhook.h"
 #include <string>
-#include "resource.h"
+#include "Resource.h"
 #include "startup.h"
 #include "SettingsDialog.h"
 #include <Shlwapi.h>
@@ -38,7 +38,12 @@ static void toggleHook();
 static void createWindow(HINSTANCE instance);
 static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-int CALLBACK wWinMain(HINSTANCE instance, HINSTANCE prev, LPWSTR args, int showType) {
+int CALLBACK wWinMain(
+    _In_ HINSTANCE instance,
+    _In_opt_ HINSTANCE prev,
+    _In_ LPWSTR args,
+    _In_ int showType
+) {
     createWindow(instance);
 
     stopHook(); // Always start disabled
@@ -125,7 +130,8 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 }
 
 
-static void createWindow(HINSTANCE instance) {
+static void createWindow(HINSTANCE inst) {
+    instance = inst;
     iconActive = LoadIcon(instance, MAKEINTRESOURCE(IDR_ACTIVEICON)); // Killed.ico (red line, active/on)
     iconKilled = LoadIcon(instance, MAKEINTRESOURCE(IDR_MAINFRAME)); // Active.ico (no red line, standby/off)
 
