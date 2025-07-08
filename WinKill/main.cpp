@@ -4,11 +4,19 @@
 #include "winkillhook.h"
 #include <string>
 #include "resource.h"
+#include "startup.h"
+#include "SettingsDialog.h"
+#include <Shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
 
 #define WM_MYTRAYICON WM_USER + 2000
 #define MENU_ITEM_TOGGLE 1983
+#define MENU_ITEM_STARTUP 1984
+#define MENU_ITEM_SETTINGS 1985
 #define MENU_ITEM_EXIT 1979
 #define MENU_ITEM_TOGGLE_CAPTION L"Toggle"
+#define MENU_ITEM_STARTUP_CAPTION L"Startup on Boot"
+#define MENU_ITEM_SETTINGS_CAPTION L"Settings..."
 #define MENU_ITEM_EXIT_CAPTION L"Exit"
 #define TRAY_ICON_TIP L"WinKill v2025.6.11"
 #define WINDOW_CLASS L"WinKillClass"
@@ -89,6 +97,23 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 
                 case MENU_ITEM_TOGGLE:
                     toggleHook();
+                    return 1;
+
+                case MENU_ITEM_STARTUP: {
+                    wchar_t exePath[MAX_PATH];
+                    GetModuleFileName(nullptr, exePath, MAX_PATH);
+                    std::wstring appName = L"WinKill";
+                    if (IsInStartup(appName)) {
+                        RemoveFromStartup(appName);
+                        MessageBox(mainWindow, L"WinKill will no longer start with Windows.", L"Startup", MB_OK);
+                    } else {
+                        AddToStartup(appName, exePath);
+                        MessageBox(mainWindow, L"WinKill will now start with Windows.", L"Startup", MB_OK);
+                    }
+                    return 1;
+                }
+                case MENU_ITEM_SETTINGS:
+                    DialogBox(instance, MAKEINTRESOURCE(IDD_SETTINGS_DIALOG), mainWindow, SettingsDialogProc);
                     return 1;
                 }
             }
@@ -184,12 +209,10 @@ static void createTrayMenu() {
     menuItem.fMask = MIIM_ID | MIIM_FTYPE | MIIM_STRING;
 
     AppendMenu(trayMenu, 0, MENU_ITEM_TOGGLE, MENU_ITEM_TOGGLE_CAPTION);
+    AppendMenu(trayMenu, 0, MENU_ITEM_STARTUP, MENU_ITEM_STARTUP_CAPTION);
+    AppendMenu(trayMenu, 0, MENU_ITEM_SETTINGS, MENU_ITEM_SETTINGS_CAPTION);
     AppendMenu(trayMenu, MF_SEPARATOR, MENU_ITEM_TOGGLE, L"-");
     AppendMenu(trayMenu, 0, MENU_ITEM_EXIT, MENU_ITEM_EXIT_CAPTION);
-
-    //MyCommandLineInfo commandLine;
-    //AfxGetApp()->ParseCommandLine(commandLine);
-    //commandLine.startDisabled ? StopHook() : StartHook();
 
     showTrayIcon();
 }
