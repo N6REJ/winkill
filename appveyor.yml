@@ -8,3 +8,15 @@ build_script:
 artifacts:
   - path: WinKillSetup\Release\*.msi
     name: msi
+
+deploy:
+  - provider: GitHub
+    release: 'WinKill v$(APPVEYOR_BUILD_VERSION)'
+    description: 'Automated release from AppVeyor'
+    auth_token: $(GH_PAT)
+    artifact: WinKillSetup\Release\WinKill.msi
+    draft: false
+    prerelease: false
+    on:
+      branch: main
+      APPVEYOR_REPO_TAG: true
