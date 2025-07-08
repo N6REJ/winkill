@@ -182,7 +182,7 @@ static void showTrayIcon() {
     trayIconData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     trayIconData.uCallbackMessage = WM_MYTRAYICON;
     trayIconData.hIcon = hooked ? iconActive : iconKilled;
-    ::wcscpy_s(trayIconData.szTip, 255, TRAY_ICON_TIP);
+    ::wcsncpy_s(trayIconData.szTip, ARRAYSIZE(trayIconData.szTip), TRAY_ICON_TIP, _TRUNCATE);
 
     trayIconDataVisible = (Shell_NotifyIcon(NIM_ADD, &trayIconData) != 0);
 
