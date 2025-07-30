@@ -9,15 +9,25 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "WinKillSetup", "WinKillSetu
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|Win32 = Debug|Win32
+		Release|Any CPU = Release|Any CPU
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{092BD9BF-9E3B-4374-AA38-EA19C9A09DD4}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{092BD9BF-9E3B-4374-AA38-EA19C9A09DD4}.Debug|Any CPU.Build.0 = Debug|x64
 		{092BD9BF-9E3B-4374-AA38-EA19C9A09DD4}.Debug|Win32.ActiveCfg = Debug|Win32
 		{092BD9BF-9E3B-4374-AA38-EA19C9A09DD4}.Debug|Win32.Build.0 = Debug|Win32
+		{092BD9BF-9E3B-4374-AA38-EA19C9A09DD4}.Release|Any CPU.ActiveCfg = Release|x64
+		{092BD9BF-9E3B-4374-AA38-EA19C9A09DD4}.Release|Any CPU.Build.0 = Release|x64
 		{092BD9BF-9E3B-4374-AA38-EA19C9A09DD4}.Release|Win32.ActiveCfg = Release|x64
 		{092BD9BF-9E3B-4374-AA38-EA19C9A09DD4}.Release|Win32.Build.0 = Release|x64
+		{D170B5B8-35D8-4EBB-5A44-4E0D10058BF4}.Debug|Any CPU.ActiveCfg = Debug
+		{D170B5B8-35D8-4EBB-5A44-4E0D10058BF4}.Debug|Any CPU.Build.0 = Debug
 		{D170B5B8-35D8-4EBB-5A44-4E0D10058BF4}.Debug|Win32.ActiveCfg = Debug
+		{D170B5B8-35D8-4EBB-5A44-4E0D10058BF4}.Release|Any CPU.ActiveCfg = Release
+		{D170B5B8-35D8-4EBB-5A44-4E0D10058BF4}.Release|Any CPU.Build.0 = Release
 		{D170B5B8-35D8-4EBB-5A44-4E0D10058BF4}.Release|Win32.ActiveCfg = Release
 		{D170B5B8-35D8-4EBB-5A44-4E0D10058BF4}.Release|Win32.Build.0 = Release
 	EndGlobalSection
