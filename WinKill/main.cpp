@@ -25,18 +25,27 @@
 #define MENU_ITEM_EXIT_CAPTION L"Exit"
 #define WINDOW_CLASS L"WinKillClass"
 
+#ifndef NIN_SELECT
+#define NIN_SELECT (WM_USER + 0)
+#endif
+#ifndef NIN_KEYSELECT
+#define NIN_KEYSELECT (WM_USER + 1)
+#endif
+
 static HICON iconActive = nullptr, iconKilled = nullptr;
 static bool hooked = false, trayIconDataVisible = false;
 static HMENU trayMenu = 0;
 static NOTIFYICONDATA trayIconData = { };
 static HWND mainWindow = NULL;
 static HINSTANCE instance = NULL;
+static ULONGLONG g_lastTrayToggleTime = 0;
 
 static void showTrayIcon();
-static void setTrayIcon(HICON icon);
+static void setTrayIcon(HICON icon, bool isHooked);
 static void hideTrayIcon();
 static void createTrayMenu();
 static void updateStartupMenuCheckmark();
+static void updateToggleMenuState();
 static void reloadHotkey();
 static void startHook();
 static void stopHook();
@@ -92,6 +101,8 @@ int CALLBACK wWinMain(
         return 0;
     }
 
+    RegisterApplicationRestart(L"", 0);
+
     createWindow(inst);
 
     winkill_set_capslock_blocked(LoadCapsLockSetting());
@@ -125,20 +136,29 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
     switch(msg) {
         case WM_MYTRAYICON: {
             switch (LOWORD(lParam)) {
-                case WM_LBUTTONDOWN: {
-                    toggleHook();
+                case WM_LBUTTONDOWN:
+                case WM_LBUTTONUP:
+                case NIN_SELECT:
+                case NIN_KEYSELECT: {
+                    ULONGLONG now = GetTickCount64();
+                    if (now - g_lastTrayToggleTime >= 250) {
+                        g_lastTrayToggleTime = now;
+                        toggleHook();
+                    }
                     break;
                 }
 
-                case WM_RBUTTONUP: {
-                        POINT cursor = { 0 };
-                        ::GetCursorPos(&cursor);
-                        ::SetForegroundWindow(mainWindow);
-                        updateStartupMenuCheckmark();
-                        TrackPopupMenuEx(trayMenu, 0, cursor.x, cursor.y, hwnd, nullptr);
-                        PostMessage(mainWindow, WM_NULL, 0, 0);
-                    }
+                case WM_RBUTTONUP:
+                case WM_CONTEXTMENU: {
+                    POINT cursor = { 0 };
+                    ::GetCursorPos(&cursor);
+                    ::SetForegroundWindow(mainWindow);
+                    updateStartupMenuCheckmark();
+                    updateToggleMenuState();
+                    TrackPopupMenuEx(trayMenu, 0, cursor.x, cursor.y, hwnd, nullptr);
+                    PostMessage(mainWindow, WM_NULL, 0, 0);
                     break;
+                }
             }
             return 0;
         }
@@ -151,11 +171,31 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
             break;
         }
 
+        case WM_CLOSE: {
+            DestroyWindow(hwnd);
+            return 0;
+        }
+
+        case WM_QUERYENDSESSION: {
+            return TRUE;
+        }
+
+        case WM_ENDSESSION: {
+            if (wParam) {
+                UnregisterHotKey(hwnd, 1);
+                stopHook();
+                hideTrayIcon();
+                PostQuitMessage(0);
+            }
+            return 0;
+        }
+
         case WM_DESTROY: {
             UnregisterHotKey(hwnd, 1);
             stopHook();
             hideTrayIcon();
-            break;
+            PostQuitMessage(0);
+            return 0;
         }
 
         case WM_COMMAND: {
@@ -202,8 +242,12 @@ static void reloadHotkey() {
         UnregisterHotKey(mainWindow, 1);
         HotkeySetting hk = LoadHotkeySetting();
         if (hk.vk != 0) {
-            if (!RegisterHotKey(mainWindow, 1, hk.fsModifiers, hk.vk)) {
-                RegisterHotKey(mainWindow, 1, hk.fsModifiers & ~MOD_NOREPEAT, hk.vk);
+            UINT fsModifiers = hk.fsModifiers;
+            if (hk.vk == VK_PAUSE) {
+                fsModifiers &= ~MOD_NOREPEAT;
+            }
+            if (!RegisterHotKey(mainWindow, 1, fsModifiers, hk.vk)) {
+                RegisterHotKey(mainWindow, 1, fsModifiers & ~MOD_NOREPEAT, hk.vk);
             }
         }
     }
@@ -259,7 +303,7 @@ static void showTrayIcon() {
         return;
     }
 
-    std::wstring verStr = GetAppVersionString();
+    std::wstring tip = hooked ? L"WinKill - Active" : L"WinKill - Disabled";
 
     SecureZeroMemory(&trayIconData, sizeof(trayIconData));
     trayIconData.cbSize = sizeof(trayIconData);
@@ -268,7 +312,7 @@ static void showTrayIcon() {
     trayIconData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     trayIconData.uCallbackMessage = WM_MYTRAYICON;
     trayIconData.hIcon = hooked ? iconActive : iconKilled;
-    ::wcsncpy_s(trayIconData.szTip, ARRAYSIZE(trayIconData.szTip), verStr.c_str(), _TRUNCATE);
+    ::wcsncpy_s(trayIconData.szTip, ARRAYSIZE(trayIconData.szTip), tip.c_str(), _TRUNCATE);
 
     trayIconDataVisible = (Shell_NotifyIcon(NIM_ADD, &trayIconData) != 0);
 
@@ -286,10 +330,19 @@ static void hideTrayIcon() {
     trayIconDataVisible = !(Shell_NotifyIcon(NIM_DELETE, &trayIconData) != 0);
 }
 
-static void setTrayIcon(HICON icon) {
+static void setTrayIcon(HICON icon, bool isHooked) {
     if (trayIconDataVisible) {
         trayIconData.hIcon = icon;
+        trayIconData.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE;
+        std::wstring tip = isHooked ? L"WinKill - Active" : L"WinKill - Disabled";
+        ::wcsncpy_s(trayIconData.szTip, ARRAYSIZE(trayIconData.szTip), tip.c_str(), _TRUNCATE);
         Shell_NotifyIcon(NIM_MODIFY, &trayIconData);
+    }
+}
+
+static void updateToggleMenuState() {
+    if (trayMenu) {
+        CheckMenuItem(trayMenu, MENU_ITEM_TOGGLE, hooked ? MF_CHECKED : MF_UNCHECKED);
     }
 }
 
@@ -309,6 +362,7 @@ static void createTrayMenu() {
     AppendMenu(trayMenu, MF_STRING, MENU_ITEM_EXIT, MENU_ITEM_EXIT_CAPTION);
 
     updateStartupMenuCheckmark();
+    updateToggleMenuState();
     showTrayIcon();
 }
 
@@ -317,7 +371,8 @@ static void startHook() {
     hooked = winkill_install_hook(mainWindow);
 
     if (hooked) {
-        setTrayIcon(iconActive);
+        setTrayIcon(iconActive, true);
+        updateToggleMenuState();
     }
     else {
         MessageBox(mainWindow, L"Couldn't start keyboard hook!", L"WinKill", MB_OK);
@@ -328,7 +383,8 @@ static void stopHook() {
     hooked = (!winkill_remove_hook());
 
     if (!hooked) {
-        setTrayIcon(iconKilled);
+        setTrayIcon(iconKilled, false);
+        updateToggleMenuState();
     }
 }
 

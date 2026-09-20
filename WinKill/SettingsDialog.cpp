@@ -48,7 +48,7 @@ void SaveHotkeySetting(const HotkeySetting& hk) {
 
 HotkeySetting LoadHotkeySetting() {
     HKEY hKey;
-    HotkeySetting hk = { MOD_NOREPEAT, VK_PAUSE }; // Default: Pause/Break, no modifiers
+    HotkeySetting hk = { 0, VK_PAUSE }; // Default: Pause/Break, no modifiers
     DWORD data[2] = { 0 };
     DWORD size = sizeof(data);
     if (RegOpenKeyExW(HKEY_CURRENT_USER, kSettingsKey, 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS) {
@@ -159,7 +159,7 @@ std::wstring HotkeyToString(const HotkeySetting& hk) {
 
 // --- Dialog procedure ---
 
-static HotkeySetting g_pendingHotkey = { MOD_NOREPEAT, VK_PAUSE };
+static HotkeySetting g_pendingHotkey = { 0, VK_PAUSE };
 static bool g_capturingHotkey = false;
 static WNDPROC g_oldEditProc = NULL;
 static HWND g_hCurrentDlg = NULL;
@@ -174,11 +174,15 @@ static bool ProcessCapturedKey(HWND hDlg, WPARAM wParam) {
         return false;
     }
 
-    UINT mod = MOD_NOREPEAT;
+    UINT mod = 0;
     if (GetAsyncKeyState(VK_CONTROL) & 0x8000) mod |= MOD_CONTROL;
     if (GetAsyncKeyState(VK_MENU) & 0x8000)    mod |= MOD_ALT;
     if (GetAsyncKeyState(VK_SHIFT) & 0x8000)   mod |= MOD_SHIFT;
     if (GetAsyncKeyState(VK_LWIN) & 0x8000 || GetAsyncKeyState(VK_RWIN) & 0x8000) mod |= MOD_WIN;
+
+    if (vk != VK_PAUSE && mod != 0) {
+        mod |= MOD_NOREPEAT;
+    }
 
     g_pendingHotkey.fsModifiers = mod;
     g_pendingHotkey.vk = vk;
