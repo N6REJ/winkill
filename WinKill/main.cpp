@@ -25,20 +25,12 @@
 #define MENU_ITEM_EXIT_CAPTION L"Exit"
 #define WINDOW_CLASS L"WinKillClass"
 
-#ifndef NIN_SELECT
-#define NIN_SELECT (WM_USER + 0)
-#endif
-#ifndef NIN_KEYSELECT
-#define NIN_KEYSELECT (WM_USER + 1)
-#endif
-
 static HICON iconActive = nullptr, iconKilled = nullptr;
 static bool hooked = false, trayIconDataVisible = false;
 static HMENU trayMenu = 0;
 static NOTIFYICONDATA trayIconData = { };
 static HWND mainWindow = NULL;
 static HINSTANCE instance = NULL;
-static ULONGLONG g_lastTrayToggleTime = 0;
 
 static void showTrayIcon();
 static void setTrayIcon(HICON icon, bool isHooked);
@@ -101,8 +93,6 @@ int CALLBACK wWinMain(
         return 0;
     }
 
-    RegisterApplicationRestart(L"", 0);
-
     createWindow(inst);
 
     winkill_set_capslock_blocked(LoadCapsLockSetting());
@@ -136,15 +126,8 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
     switch(msg) {
         case WM_MYTRAYICON: {
             switch (LOWORD(lParam)) {
-                case WM_LBUTTONDOWN:
-                case WM_LBUTTONUP:
-                case NIN_SELECT:
-                case NIN_KEYSELECT: {
-                    ULONGLONG now = GetTickCount64();
-                    if (now - g_lastTrayToggleTime >= 250) {
-                        g_lastTrayToggleTime = now;
-                        toggleHook();
-                    }
+                case WM_LBUTTONDOWN: {
+                    toggleHook();
                     break;
                 }
 
@@ -291,7 +274,7 @@ static void createWindow(HINSTANCE inst) {
         mainWindow,
         nullptr,
         -32000, -32000, 50, 50,
-        SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+        SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER);
 
     reloadHotkey();
     createTrayMenu();
