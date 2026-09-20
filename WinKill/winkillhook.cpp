@@ -4,6 +4,15 @@
 static HHOOK hook = NULL;
 static HWND hwnd = NULL;
 static HINSTANCE instance = NULL;
+static bool blockCapsLock = false;
+
+void winkill_set_capslock_blocked(bool blocked) {
+    blockCapsLock = blocked;
+}
+
+bool winkill_is_capslock_blocked() {
+    return blockCapsLock;
+}
 
 LRESULT CALLBACK keyboard_proc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode == HC_ACTION) {
@@ -13,7 +22,8 @@ LRESULT CALLBACK keyboard_proc(int nCode, WPARAM wParam, LPARAM lParam) {
         case WM_SYSKEYDOWN:
         case WM_SYSKEYUP: {
                 DWORD keyCode = ((PKBDLLHOOKSTRUCT) lParam)->vkCode;
-                if ((keyCode == VK_LWIN) || (keyCode == VK_RWIN)) {
+                if ((keyCode == VK_LWIN) || (keyCode == VK_RWIN) ||
+                    (blockCapsLock && keyCode == VK_CAPITAL)) {
                     return 1;
                 }
             }

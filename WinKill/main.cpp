@@ -3,55 +3,102 @@
 #include <tchar.h>
 #include "winkillhook.h"
 #include <string>
+#include <vector>
 #include "Resource.h"
 #include "startup.h"
 #include "SettingsDialog.h"
 #include <Shlwapi.h>
-#pragma comment(lib, "Shlwapi.lib")
 
-#define WM_MYTRAYICON WM_USER + 2000
+#pragma comment(lib, "Shlwapi.lib")
+#pragma comment(lib, "Version.lib")
+
+#define WM_MYTRAYICON (WM_USER + 2000)
+#define MENU_ITEM_VERSION 1980
 #define MENU_ITEM_TOGGLE 1983
 #define MENU_ITEM_STARTUP 1984
 #define MENU_ITEM_SETTINGS 1985
 #define MENU_ITEM_EXIT 1979
+
 #define MENU_ITEM_TOGGLE_CAPTION L"Toggle"
 #define MENU_ITEM_STARTUP_CAPTION L"Startup on Boot"
 #define MENU_ITEM_SETTINGS_CAPTION L"Settings..."
 #define MENU_ITEM_EXIT_CAPTION L"Exit"
-#define TRAY_ICON_TIP L"WinKill v2025.6.11"
 #define WINDOW_CLASS L"WinKillClass"
 
 static HICON iconActive = nullptr, iconKilled = nullptr;
 static bool hooked = false, trayIconDataVisible = false;
 static HMENU trayMenu = 0;
 static NOTIFYICONDATA trayIconData = { };
-static HWND mainWindow;
-static HINSTANCE instance;
+static HWND mainWindow = NULL;
+static HINSTANCE instance = NULL;
 
 static void showTrayIcon();
 static void setTrayIcon(HICON icon);
 static void hideTrayIcon();
 static void createTrayMenu();
+static void updateStartupMenuCheckmark();
+static void reloadHotkey();
 static void startHook();
 static void stopHook();
 static void toggleHook();
 static void createWindow(HINSTANCE instance);
 static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+static std::wstring GetAppVersionString() {
+    wchar_t path[MAX_PATH] = {0};
+    if (GetModuleFileName(NULL, path, MAX_PATH)) {
+        DWORD handle = 0;
+        DWORD size = GetFileVersionInfoSize(path, &handle);
+        if (size > 0) {
+            std::vector<BYTE> buffer(size);
+            if (GetFileVersionInfo(path, handle, size, buffer.data())) {
+                VS_FIXEDFILEINFO* fileInfo = nullptr;
+                UINT len = 0;
+                if (VerQueryValue(buffer.data(), L"\\", (LPVOID*)&fileInfo, &len) && len >= sizeof(VS_FIXEDFILEINFO)) {
+                    UINT major = HIWORD(fileInfo->dwFileVersionMS);
+                    UINT minor = LOWORD(fileInfo->dwFileVersionMS);
+                    UINT patch = HIWORD(fileInfo->dwFileVersionLS);
+                    wchar_t ver[64];
+                    swprintf_s(ver, L"WinKill v%u.%u.%u", major, minor, patch);
+                    return ver;
+                }
+            }
+        }
+    }
+    return L"WinKill v2025.8.1";
+}
+
 int CALLBACK wWinMain(
-    _In_ HINSTANCE instance,
+    _In_ HINSTANCE inst,
     _In_opt_ HINSTANCE prev,
     _In_ LPWSTR args,
     _In_ int showType
 ) {
-    createWindow(instance);
+    HANDLE mutex = CreateMutex(NULL, TRUE, L"WinKillSingleInstanceMutex");
+    if (GetLastError() == ERROR_ALREADY_EXISTS) {
+        return 0;
+    }
 
-    stopHook(); // Always start disabled
+    createWindow(inst);
+
+    winkill_set_capslock_blocked(LoadCapsLockSetting());
+
+    StartupState state = LoadStartupState();
+    if (state == StartupState::Active) {
+        startHook();
+    } else {
+        stopHook();
+    }
 
     MSG msg = { };
     while (GetMessage(&msg, nullptr, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+    }
+
+    if (mutex) {
+        ReleaseMutex(mutex);
+        CloseHandle(mutex);
     }
 
     return 0;
@@ -70,6 +117,7 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                         POINT cursor = { 0 };
                         ::GetCursorPos(&cursor);
                         ::SetForegroundWindow(mainWindow);
+                        updateStartupMenuCheckmark();
                         TrackPopupMenuEx(trayMenu, 0, cursor.x, cursor.y, hwnd, nullptr);
                         PostMessage(mainWindow, WM_NULL, 0, 0);
                     }
@@ -79,7 +127,7 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
         }
 
         case WM_HOTKEY: {
-            if (wParam == 1) { // id=1 for Pause/Break
+            if (wParam == 1) {
                 toggleHook();
                 return 0;
             }
@@ -87,7 +135,7 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
         }
 
         case WM_DESTROY: {
-            UnregisterHotKey(hwnd, 1); // Unregister Pause/Break hotkey
+            UnregisterHotKey(hwnd, 1);
             stopHook();
             hideTrayIcon();
             break;
@@ -110,15 +158,17 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                     std::wstring appName = L"WinKill";
                     if (IsInStartup(appName)) {
                         RemoveFromStartup(appName);
-                        MessageBox(mainWindow, L"WinKill will no longer start with Windows.", L"Startup", MB_OK);
                     } else {
                         AddToStartup(appName, exePath);
-                        MessageBox(mainWindow, L"WinKill will now start with Windows.", L"Startup", MB_OK);
                     }
+                    updateStartupMenuCheckmark();
                     return 1;
                 }
                 case MENU_ITEM_SETTINGS:
-                    DialogBox(instance, MAKEINTRESOURCE(IDD_SETTINGS_DIALOG), mainWindow, SettingsDialogProc);
+                    if (DialogBox(instance, MAKEINTRESOURCE(IDD_SETTINGS_DIALOG), mainWindow, SettingsDialogProc) == IDOK) {
+                        reloadHotkey();
+                        updateStartupMenuCheckmark();
+                    }
                     return 1;
                 }
             }
@@ -129,11 +179,25 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
+static void reloadHotkey() {
+    if (mainWindow) {
+        UnregisterHotKey(mainWindow, 1);
+        HotkeySetting hk = LoadHotkeySetting();
+        RegisterHotKey(mainWindow, 1, hk.fsModifiers, hk.vk);
+    }
+}
+
+static void updateStartupMenuCheckmark() {
+    if (trayMenu) {
+        bool inStartup = IsInStartup(L"WinKill");
+        CheckMenuItem(trayMenu, MENU_ITEM_STARTUP, inStartup ? MF_CHECKED : MF_UNCHECKED);
+    }
+}
 
 static void createWindow(HINSTANCE inst) {
     instance = inst;
-    iconActive = LoadIcon(instance, MAKEINTRESOURCE(IDR_ACTIVEICON)); // Killed.ico (red line, active/on)
-    iconKilled = LoadIcon(instance, MAKEINTRESOURCE(IDR_MAINFRAME)); // Active.ico (no red line, standby/off)
+    iconActive = LoadIcon(instance, MAKEINTRESOURCE(IDR_ACTIVEICON)); // Active.ico (no red line, active/on)
+    iconKilled = LoadIcon(instance, MAKEINTRESOURCE(IDR_MAINFRAME));  // Standby.ico (red line, standby/off)
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = windowProc;
@@ -141,11 +205,13 @@ static void createWindow(HINSTANCE inst) {
     wc.lpszClassName = L"WinKillClass";
     RegisterClass(&wc);
 
+    std::wstring verStr = GetAppVersionString();
+
     mainWindow =
         CreateWindowEx(
             WS_EX_TOOLWINDOW,
             WINDOW_CLASS,
-            TRAY_ICON_TIP,
+            verStr.c_str(),
             0,
             0, 0, 0, 0, /* dimens */
             nullptr,
@@ -161,11 +227,7 @@ static void createWindow(HINSTANCE inst) {
         -32000, -32000, 50, 50,
         SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 
-    // Register Pause/Break key as a global hotkey (id=1)
-    if (!RegisterHotKey(mainWindow, 1, 0, VK_PAUSE)) {
-        MessageBox(mainWindow, L"Failed to register Pause/Break as a global hotkey. It may already be registered by another application.", L"Hotkey Registration Failed", MB_OK | MB_ICONERROR);
-    }
-
+    reloadHotkey();
     createTrayMenu();
     showTrayIcon();
 }
@@ -175,6 +237,8 @@ static void showTrayIcon() {
         return;
     }
 
+    std::wstring verStr = GetAppVersionString();
+
     SecureZeroMemory(&trayIconData, sizeof(trayIconData));
     trayIconData.cbSize = sizeof(trayIconData);
     trayIconData.hWnd = mainWindow;
@@ -182,7 +246,7 @@ static void showTrayIcon() {
     trayIconData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     trayIconData.uCallbackMessage = WM_MYTRAYICON;
     trayIconData.hIcon = hooked ? iconActive : iconKilled;
-    ::wcsncpy_s(trayIconData.szTip, ARRAYSIZE(trayIconData.szTip), TRAY_ICON_TIP, _TRUNCATE);
+    ::wcsncpy_s(trayIconData.szTip, ARRAYSIZE(trayIconData.szTip), verStr.c_str(), _TRUNCATE);
 
     trayIconDataVisible = (Shell_NotifyIcon(NIM_ADD, &trayIconData) != 0);
 
@@ -208,22 +272,26 @@ static void setTrayIcon(HICON icon) {
 }
 
 static void createTrayMenu() {
+    if (trayMenu) {
+        DestroyMenu(trayMenu);
+    }
     trayMenu = CreatePopupMenu();
 
-    MENUITEMINFO menuItem = { 0 };
-    menuItem.cbSize = sizeof(MENUITEMINFO);
-    menuItem.fMask = MIIM_ID | MIIM_FTYPE | MIIM_STRING;
+    std::wstring verStr = GetAppVersionString();
+    AppendMenu(trayMenu, MF_STRING | MF_GRAYED, MENU_ITEM_VERSION, verStr.c_str());
+    AppendMenu(trayMenu, MF_SEPARATOR, 0, nullptr);
+    AppendMenu(trayMenu, MF_STRING, MENU_ITEM_TOGGLE, MENU_ITEM_TOGGLE_CAPTION);
+    AppendMenu(trayMenu, MF_STRING, MENU_ITEM_STARTUP, MENU_ITEM_STARTUP_CAPTION);
+    AppendMenu(trayMenu, MF_STRING, MENU_ITEM_SETTINGS, MENU_ITEM_SETTINGS_CAPTION);
+    AppendMenu(trayMenu, MF_SEPARATOR, 0, nullptr);
+    AppendMenu(trayMenu, MF_STRING, MENU_ITEM_EXIT, MENU_ITEM_EXIT_CAPTION);
 
-    AppendMenu(trayMenu, 0, MENU_ITEM_TOGGLE, MENU_ITEM_TOGGLE_CAPTION);
-    AppendMenu(trayMenu, 0, MENU_ITEM_STARTUP, MENU_ITEM_STARTUP_CAPTION);
-    AppendMenu(trayMenu, 0, MENU_ITEM_SETTINGS, MENU_ITEM_SETTINGS_CAPTION);
-    AppendMenu(trayMenu, MF_SEPARATOR, MENU_ITEM_TOGGLE, L"-");
-    AppendMenu(trayMenu, 0, MENU_ITEM_EXIT, MENU_ITEM_EXIT_CAPTION);
-
+    updateStartupMenuCheckmark();
     showTrayIcon();
 }
 
 static void startHook() {
+    winkill_set_capslock_blocked(LoadCapsLockSetting());
     hooked = winkill_install_hook(mainWindow);
 
     if (hooked) {

@@ -1,19 +1,15 @@
+#include "SettingsDialog.h"
 #include <windows.h>
 #include <string>
 #include <sstream>
 #include "resource.h"
 #include "startup.h"
+#include "winkillhook.h"
 
 const wchar_t* kSettingsKey = L"Software\\WinKill";
 const wchar_t* kStartupStateValue = L"StartupState"; // "active" or "inactive"
-const wchar_t* kKeybindValue = L"Hotkey"; // New registry value
-
-enum class StartupState { Active, Inactive };
-
-struct HotkeySetting {
-    UINT fsModifiers; // MOD_ALT | MOD_CONTROL | MOD_SHIFT | MOD_WIN
-    UINT vk;          // Virtual-key code
-};
+const wchar_t* kKeybindValue = L"Hotkey";
+const wchar_t* kBlockCapsLockValue = L"BlockCapsLock";
 
 // --- Registry helpers ---
 
@@ -33,12 +29,12 @@ StartupState LoadStartupState() {
     if (RegOpenKeyExW(HKEY_CURRENT_USER, kSettingsKey, 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS) {
         if (RegQueryValueExW(hKey, kStartupStateValue, 0, NULL, (LPBYTE)value, &size) == ERROR_SUCCESS) {
             RegCloseKey(hKey);
-            if (wcscmp(value, L"active") == 0) return StartupState::Active;
-        } else {
-            RegCloseKey(hKey);
+            if (_wcsicmp(value, L"active") == 0) return StartupState::Active;
+            return StartupState::Inactive;
         }
+        RegCloseKey(hKey);
     }
-    return StartupState::Inactive; // Default
+    return StartupState::Active; // Default: Active
 }
 
 void SaveHotkeySetting(const HotkeySetting& hk) {
@@ -65,11 +61,29 @@ HotkeySetting LoadHotkeySetting() {
     return hk;
 }
 
-// --- Autostart helpers (implement these elsewhere as needed) ---
+bool LoadCapsLockSetting() {
+    HKEY hKey;
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, kSettingsKey, 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS) {
+        DWORD val = 0;
+        DWORD size = sizeof(val);
+        DWORD type = 0;
+        if (RegQueryValueExW(hKey, kBlockCapsLockValue, NULL, &type, (LPBYTE)&val, &size) == ERROR_SUCCESS) {
+            RegCloseKey(hKey);
+            return (val != 0);
+        }
+        RegCloseKey(hKey);
+    }
+    return false; // Default: disabled
+}
 
-bool AddToStartup(const std::wstring& appName, const std::wstring& exePath);
-bool RemoveFromStartup(const std::wstring& appName);
-bool IsInStartup(const std::wstring& appName);
+void SaveCapsLockSetting(bool blocked) {
+    HKEY hKey;
+    if (RegCreateKeyExW(HKEY_CURRENT_USER, kSettingsKey, 0, NULL, 0, KEY_SET_VALUE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
+        DWORD val = blocked ? 1 : 0;
+        RegSetValueExW(hKey, kBlockCapsLockValue, 0, REG_DWORD, (const BYTE*)&val, sizeof(val));
+        RegCloseKey(hKey);
+    }
+}
 
 // --- Hotkey string helper ---
 
@@ -129,7 +143,13 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 
         // Show current hotkey
         g_pendingHotkey = LoadHotkeySetting();
+        g_capturingHotkey = false;
         SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
+
+        // Set Caps Lock checkbox state
+        bool blockCaps = LoadCapsLockSetting();
+        CheckDlgButton(hDlg, IDC_CAPSLOCK_CHECK, blockCaps ? BST_CHECKED : BST_UNCHECKED);
+
         return TRUE;
     }
     case WM_COMMAND:
@@ -153,6 +173,11 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 
             // Save hotkey
             SaveHotkeySetting(g_pendingHotkey);
+
+            // Save Caps Lock setting
+            bool blockCaps = (IsDlgButtonChecked(hDlg, IDC_CAPSLOCK_CHECK) == BST_CHECKED);
+            SaveCapsLockSetting(blockCaps);
+            winkill_set_capslock_blocked(blockCaps);
 
             EndDialog(hDlg, IDOK);
             return TRUE;
@@ -183,27 +208,4 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
         break;
     }
     return FALSE;
-}
-
-// --- Tray icon state initialization helper ---
-
-void SetTrayIconActive();
-void SetTrayIconInactive();
-
-void InitializeTrayIconBasedOnStartupState() {
-    StartupState state = LoadStartupState();
-    if (state == StartupState::Active) {
-        SetTrayIconActive();   // Show icon with no red line
-        // Optionally, set your app logic to "active" mode
-    } else {
-        SetTrayIconInactive(); // Show icon with red line
-        // Optionally, set your app logic to "inactive"/standby mode
-    }
-
-    // Register the hotkey based on the saved setting
-    HotkeySetting hk = LoadHotkeySetting();
-    RegisterHotKey(NULL, 1, hk.fsModifiers, hk.vk); // NULL should be replaced with your main window handle
-
-    // Unregister the hotkey when needed
-    UnregisterHotKey(NULL, 1);
 }

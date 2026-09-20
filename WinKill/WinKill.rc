@@ -76,8 +76,8 @@ IDI_KILLED              ICON                    "res\\Standby.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2025,7,7,1
- PRODUCTVERSION 2025,7,7,1
+ FILEVERSION 2025,8,1,0
+ PRODUCTVERSION 2025,8,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -95,13 +95,13 @@ BEGIN
             VALUE "Comments", "Disables the Windows keys using a low level keyboard hook."
             VALUE "CompanyName", "N6REJ"
             VALUE "FileDescription", "WinKill"
-            VALUE "FileVersion", "2025.07.07.1"
+            VALUE "FileVersion", "2025.8.1"
             VALUE "InternalName", "WinKill"
             VALUE "LegalCopyright", "N6REJ"
             VALUE "LegalTrademarks", "N6REJ"
             VALUE "OriginalFilename", "WinKill.exe"
             VALUE "ProductName", "WinKill"
-            VALUE "ProductVersion", "2025.07.07.1"
+            VALUE "ProductVersion", "2025.8.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -115,7 +115,7 @@ END
 // Dialog
 //
 
-IDD_SETTINGS_DIALOG DIALOGEX 0, 0, 270, 150
+IDD_SETTINGS_DIALOG DIALOGEX 0, 0, 270, 195
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "WinKill Settings"
 FONT 9, "MS Shell Dlg"
@@ -128,8 +128,10 @@ BEGIN
     LTEXT           "Key:", -1, 20, 74, 30, 10
     EDITTEXT        IDC_KEYBIND_EDIT, 50, 72, 80, 14, ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "Set",IDC_KEYBIND_SETBTN,140,72,30,14
-    PUSHBUTTON      "Save",IDC_SAVE_BUTTON,120,110,60,18
-    PUSHBUTTON      "Cancel",IDCANCEL,190,110,60,18
+    GROUPBOX        "Blocked Keys", -1, 10, 102, 250, 38
+    CONTROL         "Block Caps Lock",IDC_CAPSLOCK_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,114,110,12
+    PUSHBUTTON      "Save",IDC_SAVE_BUTTON,120,152,60,18
+    PUSHBUTTON      "Cancel",IDCANCEL,190,152,60,18
 END
 
 

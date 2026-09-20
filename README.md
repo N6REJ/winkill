@@ -15,7 +15,8 @@ To exit completely, right-click on the icon and choose exit.
 - **Autostart Option:** Enable or disable automatic startup with Windows via the settings dialog.
 - **Startup State:** Choose whether the application starts in "active" or "inactive" mode (tray icon reflects state).
 - **User-Configurable Hotkey:** Set your own global hotkey (with modifiers like Ctrl, Alt, Shift, Win) to toggle the app, instead of the default Pause/Break key.
-- **System Tray Integration:** Tray icon visually indicates active/inactive state.
+- **Optional Caps Lock Blocking:** Block the Caps Lock key in addition to Windows keys when active.
+- **System Tray Integration:** Tray icon visually indicates active/inactive state and context menu displays the current version.
 - **AppVeyor CI/CD:** Automated builds and GitHub releases via AppVeyor on tagged commits to the `main` branch.
 
 # Building
@@ -43,6 +44,7 @@ There's not much to it -- just a tray icon!
     - Enable/disable autostart.
     - Choose startup state (active/inactive).
     - Set or change the global hotkey.
+    - Enable/disable optional Caps Lock key blocking.
 
 - **Default Hotkey:**  
   The default hotkey is Pause/Break (no modifiers). You can change this in the settings dialog.
