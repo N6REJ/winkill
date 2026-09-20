@@ -1,6 +1,13 @@
 version: '{build}'
 image: Visual Studio 2022
 
+init:
+  - ps: |
+      $dateStr = (Get-Date).ToString("yyyy.MM.dd")
+      [System.Environment]::SetEnvironmentVariable('RELEASE_DATE', $dateStr, [System.EnvironmentVariableTarget]::User)
+      [System.Environment]::SetEnvironmentVariable('RELEASE_DATE', $dateStr, [System.EnvironmentVariableTarget]::Process)
+      $env:RELEASE_DATE = $dateStr
+
 build_script:
   - msbuild WinKill\WinKill.vcxproj /p:Configuration=Release /p:Platform=x64
   - '"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" WinKillSetup\WinKillSetup.vdproj /build Release'
@@ -12,7 +19,7 @@ artifacts:
 deploy:
   - provider: GitHub
     tag: $(APPVEYOR_REPO_TAG_NAME)
-    release: 'WinKill $(APPVEYOR_REPO_TAG_NAME)'
+    release: 'WinKill $(RELEASE_DATE).$(APPVEYOR_BUILD_NUMBER)'
     description: 'Automated release from AppVeyor'
     auth_token: $(GH_PAT)
     artifact: WinKillSetup\Release\WinKill.msi
