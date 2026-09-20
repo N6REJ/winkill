@@ -52,14 +52,27 @@ static std::wstring GetAppVersionString() {
         if (size > 0) {
             std::vector<BYTE> buffer(size);
             if (GetFileVersionInfo(path, handle, size, buffer.data())) {
+                LPWSTR prodVer = nullptr;
+                UINT prodVerLen = 0;
+                if (VerQueryValue(buffer.data(), L"\\StringFileInfo\\040904b0\\ProductVersion", (LPVOID*)&prodVer, &prodVerLen) && prodVer && prodVerLen > 0) {
+                    wchar_t ver[64];
+                    swprintf_s(ver, L"WinKill v%s", prodVer);
+                    return ver;
+                }
+
                 VS_FIXEDFILEINFO* fileInfo = nullptr;
                 UINT len = 0;
                 if (VerQueryValue(buffer.data(), L"\\", (LPVOID*)&fileInfo, &len) && len >= sizeof(VS_FIXEDFILEINFO)) {
                     UINT major = HIWORD(fileInfo->dwFileVersionMS);
                     UINT minor = LOWORD(fileInfo->dwFileVersionMS);
                     UINT patch = HIWORD(fileInfo->dwFileVersionLS);
+                    UINT build = LOWORD(fileInfo->dwFileVersionLS);
                     wchar_t ver[64];
-                    swprintf_s(ver, L"WinKill v%u.%u.%u", major, minor, patch);
+                    if (build > 0) {
+                        swprintf_s(ver, L"WinKill v%u.%u.%u-%u", major, minor, patch, build);
+                    } else {
+                        swprintf_s(ver, L"WinKill v%u.%u.%u", major, minor, patch);
+                    }
                     return ver;
                 }
             }

@@ -76,8 +76,8 @@ IDI_KILLED              ICON                    "res\\Standby.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2025,8,2,335
- PRODUCTVERSION 2025,8,2,335
+ FILEVERSION 2026,9,21,1
+ PRODUCTVERSION 2026,9,21,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -95,13 +95,13 @@ BEGIN
             VALUE "Comments", "Disables the Windows keys using a low level keyboard hook."
             VALUE "CompanyName", "N6REJ"
             VALUE "FileDescription", "WinKill"
-            VALUE "FileVersion", "2025.8.2"
+            VALUE "FileVersion", "2026.9.21"
             VALUE "InternalName", "WinKill"
             VALUE "LegalCopyright", "N6REJ"
             VALUE "LegalTrademarks", "N6REJ"
             VALUE "OriginalFilename", "WinKill.exe"
             VALUE "ProductName", "WinKill"
-            VALUE "ProductVersion", "2025.8.2"
+            VALUE "ProductVersion", "2026.9.21"
         END
     END
     BLOCK "VarFileInfo"

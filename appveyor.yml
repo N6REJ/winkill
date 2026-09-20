@@ -1,12 +1,11 @@
 version: '{build}'
 image: Visual Studio 2022
 
-init:
-  - ps: |
-      $dateStr = (Get-Date).ToString("yyyy.MM.dd")
-      [System.Environment]::SetEnvironmentVariable('RELEASE_DATE', $dateStr, [System.EnvironmentVariableTarget]::User)
-      [System.Environment]::SetEnvironmentVariable('RELEASE_DATE', $dateStr, [System.EnvironmentVariableTarget]::Process)
-      $env:RELEASE_DATE = $dateStr
+branches:
+  only:
+    - main
+
+skip_tags: true
 
 before_build:
   - ps: .\set-version.ps1
@@ -21,12 +20,12 @@ artifacts:
 
 deploy:
   - provider: GitHub
-    tag: $(APPVEYOR_REPO_TAG_NAME)
-    release: 'WinKill $(RELEASE_DATE).$(APPVEYOR_BUILD_NUMBER)'
+    tag: $(RELEASE_TAG)
+    release: 'WinKill $(RELEASE_TAG)'
     description: 'Automated release from AppVeyor'
     auth_token: $(GH_PAT)
     artifact: WinKillSetup\Release\WinKill.msi
     draft: false
     prerelease: false
     on:
-      APPVEYOR_REPO_TAG: true
+      branch: main
