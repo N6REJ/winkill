@@ -184,6 +184,7 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                 case MENU_ITEM_SETTINGS:
                     if (DialogBox(instance, MAKEINTRESOURCE(IDD_SETTINGS_DIALOG), mainWindow, SettingsDialogProc) == IDOK) {
                         reloadHotkey();
+                        winkill_set_capslock_blocked(LoadCapsLockSetting());
                         updateStartupMenuCheckmark();
                     }
                     return 1;
