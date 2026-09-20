@@ -6,7 +6,7 @@
 # Overview
 
 WinKill lets you temporarily disable the Windows key on your keyboard without rebooting your computer.  
-This is useful if you're always hitting the Windows key when playing games.  
+This is useful if you're always hitting the Windows &/or Capslock key when playing games.  
 Click the WinKill icon in the system tray to use it as a system-wide Windows key disabler or toggle it on/off with the "Pause"/"Break" key (default, now user-configurable).  
 To exit completely, right-click on the icon and choose exit.
 
