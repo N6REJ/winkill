@@ -11,12 +11,12 @@ artifacts:
 
 deploy:
   - provider: GitHub
-    release: 'WinKill v$(APPVEYOR_BUILD_VERSION)'
+    tag: $(APPVEYOR_REPO_TAG_NAME)
+    release: 'WinKill $(APPVEYOR_REPO_TAG_NAME)'
     description: 'Automated release from AppVeyor'
     auth_token: $(GH_PAT)
     artifact: WinKillSetup\Release\WinKill.msi
     draft: false
     prerelease: false
     on:
-      branch: main
       APPVEYOR_REPO_TAG: true
