@@ -125,7 +125,7 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
     switch(msg) {
         case WM_MYTRAYICON: {
             switch (LOWORD(lParam)) {
-                case WM_LBUTTONUP: {
+                case WM_LBUTTONDOWN: {
                     toggleHook();
                     break;
                 }

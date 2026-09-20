@@ -163,33 +163,76 @@ static HotkeySetting g_pendingHotkey = { MOD_NOREPEAT, VK_PAUSE };
 static bool g_capturingHotkey = false;
 static WNDPROC g_oldEditProc = NULL;
 static HWND g_hCurrentDlg = NULL;
+static HHOOK g_hMsgFilterHook = NULL;
 
-static void ProcessCapturedKey(HWND hDlg, WPARAM wParam) {
+static bool ProcessCapturedKey(HWND hDlg, WPARAM wParam) {
+    UINT vk = (UINT)wParam;
+    // Ignore modifier-only keys
+    if (vk == VK_CONTROL || vk == VK_MENU || vk == VK_SHIFT || vk == VK_LWIN || vk == VK_RWIN ||
+        vk == VK_LCONTROL || vk == VK_RCONTROL || vk == VK_LMENU || vk == VK_RMENU ||
+        vk == VK_LSHIFT || vk == VK_RSHIFT) {
+        return false;
+    }
+
     UINT mod = MOD_NOREPEAT;
     if (GetAsyncKeyState(VK_CONTROL) & 0x8000) mod |= MOD_CONTROL;
     if (GetAsyncKeyState(VK_MENU) & 0x8000)    mod |= MOD_ALT;
     if (GetAsyncKeyState(VK_SHIFT) & 0x8000)   mod |= MOD_SHIFT;
     if (GetAsyncKeyState(VK_LWIN) & 0x8000 || GetAsyncKeyState(VK_RWIN) & 0x8000) mod |= MOD_WIN;
-    UINT vk = (UINT)wParam;
-    // Ignore modifier-only keys
-    if (vk != VK_CONTROL && vk != VK_MENU && vk != VK_SHIFT && vk != VK_LWIN && vk != VK_RWIN &&
-        vk != VK_LCONTROL && vk != VK_RCONTROL && vk != VK_LMENU && vk != VK_RMENU &&
-        vk != VK_LSHIFT && vk != VK_RSHIFT) {
-        g_pendingHotkey.fsModifiers = mod;
-        g_pendingHotkey.vk = vk;
-        SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
-        g_capturingHotkey = false;
+
+    g_pendingHotkey.fsModifiers = mod;
+    g_pendingHotkey.vk = vk;
+    g_capturingHotkey = false;
+    SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
+    SetDlgItemTextW(hDlg, IDC_KEYBIND_SETBTN, L"Set");
+    return true;
+}
+
+static LRESULT CALLBACK MsgFilterProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode == MSGF_DIALOGBOX && g_capturingHotkey) {
+        MSG* pMsg = (MSG*)lParam;
+        if (pMsg->message == WM_KEYDOWN || pMsg->message == WM_SYSKEYDOWN) {
+            if (pMsg->wParam == VK_ESCAPE) {
+                g_capturingHotkey = false;
+                SetDlgItemTextW(g_hCurrentDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
+                SetDlgItemTextW(g_hCurrentDlg, IDC_KEYBIND_SETBTN, L"Set");
+                return 1;
+            }
+            if (ProcessCapturedKey(g_hCurrentDlg, pMsg->wParam)) {
+                return 1;
+            }
+            return 1; // Suppress modifier key processing in dialog
+        } else if (pMsg->message == WM_KEYUP || pMsg->message == WM_SYSKEYUP || pMsg->message == WM_CHAR) {
+            return 1;
+        }
     }
+    return CallNextHookEx(g_hMsgFilterHook, nCode, wParam, lParam);
 }
 
 static LRESULT CALLBACK HotkeyEditProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (uMsg == WM_LBUTTONDOWN) {
+        if (!g_capturingHotkey) {
+            g_capturingHotkey = true;
+            SetDlgItemTextW(g_hCurrentDlg, IDC_KEYBIND_EDIT, L"Press new key...");
+            SetDlgItemTextW(g_hCurrentDlg, IDC_KEYBIND_SETBTN, L"Cancel");
+        }
+        SetFocus(hWnd);
+        return 0;
+    }
     if (g_capturingHotkey) {
         if (uMsg == WM_GETDLGCODE) {
             return DLGC_WANTALLKEYS | DLGC_WANTARROWS | DLGC_WANTCHARS | DLGC_WANTTAB;
         }
         if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) {
-            ProcessCapturedKey(g_hCurrentDlg, wParam);
-            return 0;
+            if (wParam == VK_ESCAPE) {
+                g_capturingHotkey = false;
+                SetDlgItemTextW(g_hCurrentDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
+                SetDlgItemTextW(g_hCurrentDlg, IDC_KEYBIND_SETBTN, L"Set");
+                return 0;
+            }
+            if (ProcessCapturedKey(g_hCurrentDlg, wParam)) {
+                return 0;
+            }
         }
         if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP || uMsg == WM_CHAR) {
             return 0;
@@ -205,6 +248,7 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
     switch (message) {
     case WM_INITDIALOG: {
         g_hCurrentDlg = hDlg;
+        g_hMsgFilterHook = SetWindowsHookEx(WH_MSGFILTER, MsgFilterProc, NULL, GetCurrentThreadId());
 
         // Set dialog icon
         HICON hIcon = (HICON)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
@@ -238,6 +282,7 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
         g_pendingHotkey = LoadHotkeySetting();
         g_capturingHotkey = false;
         SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
+        SetDlgItemTextW(hDlg, IDC_KEYBIND_SETBTN, L"Set");
 
         // Subclass hotkey edit control
         HWND hEdit = GetDlgItem(hDlg, IDC_KEYBIND_EDIT);
@@ -254,9 +299,16 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
         case IDC_KEYBIND_SETBTN:
-            g_capturingHotkey = true;
-            SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, L"Press new key...");
-            SetFocus(GetDlgItem(hDlg, IDC_KEYBIND_EDIT));
+            if (g_capturingHotkey) {
+                g_capturingHotkey = false;
+                SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
+                SetDlgItemTextW(hDlg, IDC_KEYBIND_SETBTN, L"Set");
+            } else {
+                g_capturingHotkey = true;
+                SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, L"Press new key...");
+                SetDlgItemTextW(hDlg, IDC_KEYBIND_SETBTN, L"Cancel");
+                SetFocus(GetDlgItem(hDlg, IDC_KEYBIND_EDIT));
+            }
             return TRUE;
         case IDC_SAVE_BUTTON: {
             g_capturingHotkey = false;
@@ -297,6 +349,10 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
         break;
     case WM_DESTROY: {
         g_capturingHotkey = false;
+        if (g_hMsgFilterHook) {
+            UnhookWindowsHookEx(g_hMsgFilterHook);
+            g_hMsgFilterHook = NULL;
+        }
         HWND hEdit = GetDlgItem(hDlg, IDC_KEYBIND_EDIT);
         if (hEdit && g_oldEditProc) {
             SetWindowLongPtr(hEdit, GWLP_WNDPROC, (LONG_PTR)g_oldEditProc);
