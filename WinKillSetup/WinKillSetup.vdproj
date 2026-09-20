@@ -25,6 +25,12 @@
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_ECF8A7048989043F281D0FE3E765965B"
+        "OwnerKey" = "8:_2BD3BB7E89B64289A9B37BE83981BF38"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -132,6 +138,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ECF8A7048989043F281D0FE3E765965B"
+            {
+            "SourcePath" = "8:VERSION.dll"
+            "TargetName" = "8:VERSION.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_15E9626F45654354AAD21E6F033EB758"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -199,15 +225,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:WinKill"
-        "ProductCode" = "8:{C757A4E3-E20B-46A9-B9AA-4B9661799C83}"
-        "PackageCode" = "8:{BB7BCD28-5E2C-417E-8724-F14A2D6550B3}"
+        "ProductCode" = "8:{C77515FC-B4C7-4364-86A2-9F640AFD3073}"
+        "PackageCode" = "8:{56C776B4-50F1-4EE1-B056-D47E3B59C162}"
         "UpgradeCode" = "8:{3173B505-D33E-4CB1-A773-5C574788DA2E}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:26.9.1"
+        "ProductVersion" = "8:26.9.20"
         "Manufacturer" = "8:N6REJ"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/N6REJ/winkill/issues"
