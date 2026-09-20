@@ -97,6 +97,10 @@ int CALLBACK wWinMain(
     winkill_set_capslock_blocked(LoadCapsLockSetting());
 
     StartupState state = LoadStartupState();
+    if (args && (wcsstr(args, L"/startDisabled") != nullptr || wcsstr(args, L"-startDisabled") != nullptr)) {
+        state = StartupState::Inactive;
+    }
+
     if (state == StartupState::Active) {
         startHook();
     } else {
@@ -121,7 +125,7 @@ static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
     switch(msg) {
         case WM_MYTRAYICON: {
             switch (LOWORD(lParam)) {
-                case WM_LBUTTONDOWN: {
+                case WM_LBUTTONUP: {
                     toggleHook();
                     break;
                 }
@@ -196,7 +200,11 @@ static void reloadHotkey() {
     if (mainWindow) {
         UnregisterHotKey(mainWindow, 1);
         HotkeySetting hk = LoadHotkeySetting();
-        RegisterHotKey(mainWindow, 1, hk.fsModifiers, hk.vk);
+        if (hk.vk != 0) {
+            if (!RegisterHotKey(mainWindow, 1, hk.fsModifiers, hk.vk)) {
+                RegisterHotKey(mainWindow, 1, hk.fsModifiers & ~MOD_NOREPEAT, hk.vk);
+            }
+        }
     }
 }
 

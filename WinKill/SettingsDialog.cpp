@@ -93,12 +93,67 @@ std::wstring HotkeyToString(const HotkeySetting& hk) {
     if (hk.fsModifiers & MOD_ALT)     ss << L"Alt+";
     if (hk.fsModifiers & MOD_SHIFT)   ss << L"Shift+";
     if (hk.fsModifiers & MOD_WIN)     ss << L"Win+";
+
+    switch (hk.vk) {
+    case VK_PAUSE:   ss << L"Pause"; return ss.str();
+    case VK_CANCEL:  ss << L"Break"; return ss.str();
+    case VK_ESCAPE:  ss << L"Esc"; return ss.str();
+    case VK_SPACE:   ss << L"Space"; return ss.str();
+    case VK_RETURN:  ss << L"Enter"; return ss.str();
+    case VK_TAB:     ss << L"Tab"; return ss.str();
+    case VK_BACK:    ss << L"Backspace"; return ss.str();
+    case VK_CAPITAL: ss << L"Caps Lock"; return ss.str();
+    case VK_PRIOR:   ss << L"Page Up"; return ss.str();
+    case VK_NEXT:    ss << L"Page Down"; return ss.str();
+    case VK_END:     ss << L"End"; return ss.str();
+    case VK_HOME:    ss << L"Home"; return ss.str();
+    case VK_LEFT:    ss << L"Left"; return ss.str();
+    case VK_UP:      ss << L"Up"; return ss.str();
+    case VK_RIGHT:   ss << L"Right"; return ss.str();
+    case VK_DOWN:    ss << L"Down"; return ss.str();
+    case VK_INSERT:  ss << L"Insert"; return ss.str();
+    case VK_DELETE:  ss << L"Delete"; return ss.str();
+    case VK_SNAPSHOT:ss << L"Print Screen"; return ss.str();
+    case VK_SCROLL:  ss << L"Scroll Lock"; return ss.str();
+    case VK_NUMLOCK: ss << L"Num Lock"; return ss.str();
+    }
+
+    if (hk.vk >= VK_F1 && hk.vk <= VK_F24) {
+        ss << L"F" << (hk.vk - VK_F1 + 1);
+        return ss.str();
+    }
+
+    if (hk.vk >= VK_NUMPAD0 && hk.vk <= VK_NUMPAD9) {
+        ss << L"Num " << (hk.vk - VK_NUMPAD0);
+        return ss.str();
+    }
+
+    if ((hk.vk >= '0' && hk.vk <= '9') || (hk.vk >= 'A' && hk.vk <= 'Z')) {
+        ss << (wchar_t)hk.vk;
+        return ss.str();
+    }
+
     UINT scan = MapVirtualKeyW(hk.vk, MAPVK_VK_TO_VSC);
-    wchar_t keyName[64] = {0};
-    if (GetKeyNameTextW(scan << 16, keyName, 64) && hk.vk != 0)
-        ss << keyName;
-    else
-        ss << L"Pause";
+    if (scan != 0) {
+        wchar_t keyName[64] = {0};
+        LONG lParam = (scan << 16);
+        if (hk.vk == VK_INSERT || hk.vk == VK_DELETE || hk.vk == VK_HOME ||
+            hk.vk == VK_END || hk.vk == VK_PRIOR || hk.vk == VK_NEXT ||
+            hk.vk == VK_LEFT || hk.vk == VK_UP || hk.vk == VK_RIGHT || hk.vk == VK_DOWN ||
+            hk.vk == VK_DIVIDE || hk.vk == VK_NUMLOCK) {
+            lParam |= (1 << 24);
+        }
+        if (GetKeyNameTextW(lParam, keyName, 64) > 0) {
+            ss << keyName;
+            return ss.str();
+        }
+    }
+
+    if (hk.vk != 0) {
+        ss << L"Key 0x" << std::hex << hk.vk;
+    } else {
+        ss << L"None";
+    }
     return ss.str();
 }
 
@@ -106,6 +161,42 @@ std::wstring HotkeyToString(const HotkeySetting& hk) {
 
 static HotkeySetting g_pendingHotkey = { MOD_NOREPEAT, VK_PAUSE };
 static bool g_capturingHotkey = false;
+static WNDPROC g_oldEditProc = NULL;
+static HWND g_hCurrentDlg = NULL;
+
+static void ProcessCapturedKey(HWND hDlg, WPARAM wParam) {
+    UINT mod = MOD_NOREPEAT;
+    if (GetAsyncKeyState(VK_CONTROL) & 0x8000) mod |= MOD_CONTROL;
+    if (GetAsyncKeyState(VK_MENU) & 0x8000)    mod |= MOD_ALT;
+    if (GetAsyncKeyState(VK_SHIFT) & 0x8000)   mod |= MOD_SHIFT;
+    if (GetAsyncKeyState(VK_LWIN) & 0x8000 || GetAsyncKeyState(VK_RWIN) & 0x8000) mod |= MOD_WIN;
+    UINT vk = (UINT)wParam;
+    // Ignore modifier-only keys
+    if (vk != VK_CONTROL && vk != VK_MENU && vk != VK_SHIFT && vk != VK_LWIN && vk != VK_RWIN &&
+        vk != VK_LCONTROL && vk != VK_RCONTROL && vk != VK_LMENU && vk != VK_RMENU &&
+        vk != VK_LSHIFT && vk != VK_RSHIFT) {
+        g_pendingHotkey.fsModifiers = mod;
+        g_pendingHotkey.vk = vk;
+        SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
+        g_capturingHotkey = false;
+    }
+}
+
+static LRESULT CALLBACK HotkeyEditProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (g_capturingHotkey) {
+        if (uMsg == WM_GETDLGCODE) {
+            return DLGC_WANTALLKEYS | DLGC_WANTARROWS | DLGC_WANTCHARS | DLGC_WANTTAB;
+        }
+        if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) {
+            ProcessCapturedKey(g_hCurrentDlg, wParam);
+            return 0;
+        }
+        if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP || uMsg == WM_CHAR) {
+            return 0;
+        }
+    }
+    return CallWindowProc(g_oldEditProc, hWnd, uMsg, wParam, lParam);
+}
 
 INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     static std::wstring appName = L"WinKill";
@@ -113,6 +204,8 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 
     switch (message) {
     case WM_INITDIALOG: {
+        g_hCurrentDlg = hDlg;
+
         // Set dialog icon
         HICON hIcon = (HICON)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
         SendMessage(hDlg, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
@@ -146,6 +239,12 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
         g_capturingHotkey = false;
         SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
 
+        // Subclass hotkey edit control
+        HWND hEdit = GetDlgItem(hDlg, IDC_KEYBIND_EDIT);
+        if (hEdit) {
+            g_oldEditProc = (WNDPROC)SetWindowLongPtr(hEdit, GWLP_WNDPROC, (LONG_PTR)HotkeyEditProc);
+        }
+
         // Set Caps Lock checkbox state
         bool blockCaps = LoadCapsLockSetting();
         CheckDlgButton(hDlg, IDC_CAPSLOCK_CHECK, blockCaps ? BST_CHECKED : BST_UNCHECKED);
@@ -160,6 +259,7 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
             SetFocus(GetDlgItem(hDlg, IDC_KEYBIND_EDIT));
             return TRUE;
         case IDC_SAVE_BUTTON: {
+            g_capturingHotkey = false;
             BOOL checked = (IsDlgButtonChecked(hDlg, IDC_AUTOSTART_CHECK) == BST_CHECKED);
             if (checked)
                 AddToStartup(appName, exePath);
@@ -183,6 +283,7 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
             return TRUE;
         }
         case IDCANCEL:
+            g_capturingHotkey = false;
             EndDialog(hDlg, IDCANCEL);
             return TRUE;
         }
@@ -190,22 +291,19 @@ INT_PTR CALLBACK SettingsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
         if (g_capturingHotkey) {
-            UINT mod = MOD_NOREPEAT;
-            if (GetAsyncKeyState(VK_CONTROL) & 0x8000) mod |= MOD_CONTROL;
-            if (GetAsyncKeyState(VK_MENU) & 0x8000)    mod |= MOD_ALT;
-            if (GetAsyncKeyState(VK_SHIFT) & 0x8000)   mod |= MOD_SHIFT;
-            if (GetAsyncKeyState(VK_LWIN) & 0x8000 || GetAsyncKeyState(VK_RWIN) & 0x8000) mod |= MOD_WIN;
-            UINT vk = (UINT)wParam;
-            // Ignore modifier-only keys
-            if (vk != VK_CONTROL && vk != VK_MENU && vk != VK_SHIFT && vk != VK_LWIN && vk != VK_RWIN) {
-                g_pendingHotkey.fsModifiers = mod;
-                g_pendingHotkey.vk = vk;
-                SetDlgItemTextW(hDlg, IDC_KEYBIND_EDIT, HotkeyToString(g_pendingHotkey).c_str());
-                g_capturingHotkey = false;
-            }
+            ProcessCapturedKey(hDlg, wParam);
             return TRUE;
         }
         break;
+    case WM_DESTROY: {
+        g_capturingHotkey = false;
+        HWND hEdit = GetDlgItem(hDlg, IDC_KEYBIND_EDIT);
+        if (hEdit && g_oldEditProc) {
+            SetWindowLongPtr(hEdit, GWLP_WNDPROC, (LONG_PTR)g_oldEditProc);
+            g_oldEditProc = NULL;
+        }
+        break;
+    }
     }
     return FALSE;
 }

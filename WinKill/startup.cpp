@@ -11,9 +11,14 @@ bool AddToStartup(const std::wstring& appName, const std::wstring& exePath) {
         return false;
     }
     
+    std::wstring quotedPath = exePath;
+    if (!quotedPath.empty() && quotedPath.front() != L'\"') {
+        quotedPath = L"\"" + quotedPath + L"\"";
+    }
+
     result = RegSetValueExW(hKey, appName.c_str(), 0, REG_SZ, 
-                           (const BYTE*)exePath.c_str(), 
-                           (DWORD)((exePath.length() + 1) * sizeof(wchar_t)));
+                           (const BYTE*)quotedPath.c_str(), 
+                           (DWORD)((quotedPath.length() + 1) * sizeof(wchar_t)));
     
     RegCloseKey(hKey);
     return (result == ERROR_SUCCESS);
@@ -46,10 +51,7 @@ bool IsInStartup(const std::wstring& appName) {
         return false;
     }
     
-    wchar_t value[MAX_PATH];
-    DWORD valueSize = sizeof(value);
-    result = RegQueryValueExW(hKey, appName.c_str(), 0, NULL, 
-                             (LPBYTE)value, &valueSize);
+    result = RegQueryValueExW(hKey, appName.c_str(), 0, NULL, NULL, NULL);
     
     RegCloseKey(hKey);
     return (result == ERROR_SUCCESS);
