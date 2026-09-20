@@ -274,7 +274,7 @@ static void createWindow(HINSTANCE inst) {
         mainWindow,
         nullptr,
         -32000, -32000, 50, 50,
-        SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER);
+        SWP_FRAMECHANGED | SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOZORDER);
 
     reloadHotkey();
     createTrayMenu();
