@@ -12,7 +12,7 @@ before_build:
 
 build_script:
   - msbuild WinKill\WinKill.vcxproj /p:Configuration=Release /p:Platform=x64
-  - '"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\devenv.com" WinKillSetup\WinKillSetup.vdproj /build Release'
+  - msbuild WinKill.sln /p:Configuration=Release /p:Platform="Any CPU"
 
 artifacts:
   - path: WinKillSetup\Release\*.msi
