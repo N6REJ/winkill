@@ -3,12 +3,12 @@
   "owner": "N6REJ",
   "repo": "winkill",
   "visibility": "public",
-  "generatedAt": "2026-11-24T16:54:26.735Z",
+  "generatedAt": "2026-11-25T16:43:04.000Z",
   "stats": {
     "total": 73,
     "day": 0,
     "week": 0,
-    "month": 34
+    "month": 16
   },
   "partial": {
     "day": false,
@@ -17,9 +17,9 @@
   },
   "snapshots": {
     "windowDays": 180,
-    "count": 45,
+    "count": 46,
     "firstDate": "2026-10-11",
-    "lastDate": "2026-11-24",
+    "lastDate": "2026-11-25",
     "series": {
       "2026-10-11": 24,
       "2026-10-12": 24,
@@ -65,7 +65,8 @@
       "2026-11-21": 73,
       "2026-11-22": 73,
       "2026-11-23": 73,
-      "2026-11-24": 73
+      "2026-11-24": 73,
+      "2026-11-25": 73
     }
   },
   "profile": {
